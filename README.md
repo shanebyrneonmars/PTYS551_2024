@@ -4,41 +4,30 @@ This graduate course will focus on the use of remote sensing in the study of roc
 
 ## Ptys 551 Conda Environments
 We recommend two conda environments to participate in this class created using the code below.
-Firstly we need to install miniforge3. Installation packages and instructions are at: https://github.com/conda-forge/miniforge?tab=readme-ov-file#download
+You'll need to install miniforge3. Installation packages and instructions are at: https://github.com/conda-forge/miniforge?tab=readme-ov-file#download
 
+Once installed activate the base environment and install nb_conda_kernels so Jupyter Notebook can be run and can find any of your other environments. Usually it's bad form to install anything in the base environment - but nb_conda_kernels is an exception. I also install numpy, because I want to use IDL kernels in these notebooks sometimes and the IDL-PYTHON bridge needs it.
 
 ```bash
-###
-### Activate the base environment and install nb_conda_kernels so Jupyter Notebook can be run and can find your other environments
-### Usually it's bad form to install anything in the base environment - but nb_conda_kernels is an exception.
-### I also install numpy, because I want to use IDL kernels in these notebooks sometimes
-
 conda activate
 conda install nb_conda_kernels numpy=1.26.4
+```
+Once conda is setup up like this we'll create two environments.
+Firstly, create an environment called ptys551 and install many packages within it that will be useful later. Note the numpy version has to be the older one... many packages don't support 2.0 yet. If you're trying to start over and want to erase the current ptys551 environment then the first command just removes the existing ptys551 environment (it's harmless to run if that environment doesn't exist)
 
-
-###
-### Installing packages for PTYS551 takes about 1 GB
-### Note the numpy version has to be the older one... many packages don't support 2.0 yet
-### If you're trying to start over and want to erase the current ptys551 environment then run the first command too (it's harmless to run if the environment doesn't exist)
-
+```bash
 conda env remove -n ptys551
 conda create -n ptys551 python=3.10 numpy=1.26.4 ipykernel scipy matplotlib scikit-learn spiceypy proj gmt gdal pandas rasterio tqdm spectral glob2 pyqt jupyterlab
 
-### Add one more package not available on conda-forge
+### Add one more package with pip that is not available on conda-forge
 conda activate ptys551
 pip install outlier-utils                                                                                                                                                                                           
 conda deactivate
 ```
 
-The second environment is for the ISIS and Ames Stereo Pipeline (ASP) packages
+The second environment (called asp) we need is for the ISIS and Ames Stereo Pipeline (ASP) packages. Unfortunately, there's an irreconcilable conflict between this install and the packages in the ptys551 environment so it needs to be a separate environment for now. The ISIS and ASP packages will only take about 2.5 GB, but ISIS suppport data will take about 45 GB. After installation, an initialization script (and the 2nd activate command) sets the two environment variables needed: $ISISROOT and $ISISDATA. Note the --data-dir flag when calling the initialization script. This should be set to the local directory where you want to store the ISIS data.
 
 ```bash
-###
-### Installing Ames Stereo Pipeline and ISIS takes about 2.5 GB
-### An initialization script (and the 2nd activate command) sets the two environment variables needed: $ISISROOT and $ISISDATA
-### There's an irreconcilable conflict between this install and the packages in the ptys551 environment so it needs to be separate for now
-
 conda create -n asp
 conda activate asp
 conda config --env --add channels conda-forge
@@ -48,13 +37,11 @@ conda config --env --add channels nasa-ames-stereo-pipeline
 conda install -c nasa-ames-stereo-pipeline -c usgs-astrogeology -c conda-forge stereo-pipeline==3.3.0
 python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=/Users/shane/ISISDATA
 conda activate asp
+```
 
+With the asp environment activated, you should be able to run the downloadIsisData program with the command below to fetch all the spice kernels and calibration data for various missions along with the mission-independant base data needed. Note we exclude the SPK and CK kernels in each mission as they're enormous (explanation of what all these kernels do will be in the class). We'll use the USGS webservice instead to access these data.
 
-###
-### Installing the datasets below takes about 44 GB
-### This must be done within the asp environment in order to access the downloadIsisData program
-### Note we exclude the SPK and CK kernels in each mission as they're enormous
-
+```bash
 downloadIsisData base $ISISDATA 
 downloadIsisData lro $ISISDATA --exclude="{spk/**,ck/**}"
 downloadIsisData mro $ISISDATA --exclude="{spk/**,ck/**}"
