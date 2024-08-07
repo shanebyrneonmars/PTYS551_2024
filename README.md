@@ -6,6 +6,7 @@ This graduate course will focus on the use of remote sensing in the study of roc
 We recommend two conda environments to participate in this class created using the code below.
 Firstly we need to install miniforge3. Installation packages and instructions are at: https://github.com/conda-forge/miniforge?tab=readme-ov-file#download
 
+
 ```bash
 ###
 ### Activate the base environment and install nb_conda_kernels so Jupyter Notebook can be run and can find your other environments
