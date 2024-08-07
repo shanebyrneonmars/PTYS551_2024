@@ -14,7 +14,7 @@ conda install nb_conda_kernels numpy=1.26.4
 ```
 
 Once conda is setup up like this we'll create two environments.
-Firstly, using the commands below, create an environment called ptys551 and install many packages within it that will be useful later. Note the numpy version has to be the older one... many packages don't support 2.0 yet. If you're trying to start over and want to erase the current ptys551 environment then the first command just removes the existing ptys551 environment (it's harmless to run if that environment doesn't exist). One package isn't available on conda forge and needs to be installed with pip with in the ptys551 environment as shown in the code below.
+Firstly, using the commands below, create an environment called ptys551 and install many packages within it that will be useful later. Note the numpy version has to be the older one... many packages don't support v2.0 yet. If you're trying to start over and want to erase the current ptys551 environment then the first command just removes the existing ptys551 environment (it's harmless to run if that environment doesn't exist). One package isn't available on conda forge and needs to be installed with pip within the ptys551 environment as shown in the code below.
 
 ```bash
 conda env remove -n ptys551
@@ -26,7 +26,7 @@ pip install outlier-utils
 conda deactivate
 ```
 
-The second environment we need (called asp) is for the Integrated Software for Imagers and Spectrometers (ISIS) and Ames Stereo Pipeline (ASP) packages. Unfortunately, there's an irreconcilable conflict between this install and the packages in the ptys551 environment so it needs to be a separate environment for now. The ISIS and ASP packages will only take about 2.5 GB, but ISIS suppport data will take about 45 GB. After installation, an initialization script (and the 2nd activate command) sets the two environment variables needed: $ISISROOT and $ISISDATA. Note the --data-dir flag when calling the initialization script. This should be set to the local directory where you want to store the ISIS data i.e. change the ```/Users/shane/ISISDATA``` to something else.
+The second environment we need (called asp) is for the Integrated Software for Imagers and Spectrometers (ISIS) and Ames Stereo Pipeline (ASP) packages. Unfortunately, there's an irreconcilable conflict between this install and the packages in the ptys551 environment so it needs to be a separate environment for now. The ISIS and ASP packages will only take about 2.5 GB, but ISIS suppport data (next section) will take about 45 GB. After installation, an initialization script (and the 2nd activate command) sets the two environment variables needed: $ISISROOT and $ISISDATA. Note the ```--data-dir``` flag when calling the initialization script. This should be set to the local directory where you want to store the ISIS data i.e. change the ```/Users/shane/ISISDATA``` to something else.
 
 ```bash
 conda create -n asp
