@@ -40,7 +40,7 @@ python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=/Users/shane/ISISDATA
 conda activate asp
 ```
 
-With the asp environment activated, you should be able to run the ```downloadIsisData``` program with the commands below to fetch all the spice kernels and calibration data for various missions along with the mission-independant base data needed. Note, we exclude the SPK and CK kernels in each mission as they're enormous (explanation of what all these kernels contain will be in the class). We'll use the USGS webservice to access these data instead.
+With the asp environment activated, you should be able to run the ```downloadIsisData``` program with the commands below to fetch all the spice kernels and calibration data for various missions along with the mission-independent base data needed. Note, we exclude the SPK and CK kernels in each mission as they're enormous (explanation of what all these kernels contain will be in the class). We'll use the USGS webservice to access these data instead.
 
 ```bash
 downloadIsisData base $ISISDATA 
