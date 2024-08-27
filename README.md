@@ -28,9 +28,15 @@ conda deactivate
 
 The second environment we need (called asp) is for the Integrated Software for Imagers and Spectrometers (ISIS) and Ames Stereo Pipeline (ASP) packages. Unfortunately, there's an irreconcilable conflict between this install and the packages in the ptys551 environment so it needs to be a separate environment for now. The ISIS and ASP packages will only take about 2.5 GB, but ISIS suppport data (next section) will take about 45 GB. After installation, an initialization script (and the 2nd activate command) sets the two environment variables needed: $ISISROOT and $ISISDATA. Note the ```--data-dir``` flag when calling the initialization script. This should be set to the local directory where you want to store the ISIS data i.e. change the ```/Users/shane/ISISDATA``` to something else.
 
+Newer Macs with Apple silicon processors (M1/M2/M3 chips) are not natively supported, but can still run this software in emulation mode. If using one of these processors then set this environment variable before proceeding with ```setenv CONDA_SUBDIR osx-64``` (tcsh syntax) or ```export CONDA_SUBDIR=osx-64``` (bash syntax).
+
 ```bash
 conda create -n asp
 conda activate asp
+
+# This following line is only needed if using an Apple Silicon processor
+conda config --env --set subdir osx-64
+
 conda config --env --add channels conda-forge
 conda config --env --add channels usgs-astrogeology
 conda config --env --add channels nasa-ames-stereo-pipeline
