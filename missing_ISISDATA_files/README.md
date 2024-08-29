@@ -1,6 +1,5 @@
 
-#August 2024#
-
+# August 2024
 
 For reasons that are not understood ```downloadIsisData``` can sometimes fail to grab some small text files in the ```$ISISDATA``` area. Specifically, there are a handful of files in the ```$ISISDATA/lro/calibration``` and ```$ISISDATA/mro/calibration``` areas that sometimes need to be manually added. 
 
