@@ -57,5 +57,7 @@ downloadIsisData galileo $ISISDATA --exclude="{spk/**,ck/**}"
 downloadIsisData messenger $ISISDATA --exclude="{spk/**,ck/**}"
 downloadIsisData newhorizons $ISISDATA --exclude="{spk/**,ck/**}"
 ```
-
 That's it! 
+
+PS: if you later receive errors about missing calibration files in the LRO or MRO directories then see the README file in the missing_ISISDATA_files directory.
+

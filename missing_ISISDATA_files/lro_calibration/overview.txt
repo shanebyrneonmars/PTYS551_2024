@@ -1,0 +1,86 @@
+ == NAC Masked Pixels ==
+This file contains the values of the masked columns to be used in the NAC calibration.
+It is separated into odd and even column numbers. These values are used to create an even and odd
+average masked pixel DN value for each line that is subtracted from that line.
+
+  Latest files created by Jacob Danton on July 06, 2010 with values confirmed by Dave Humm. 
+  These values corresponded with the new masked pixel subtraction algorithm:
+    NACL_MaskedPixels.0002.pvl
+    NACR_MaskedPixels.0002.pvl
+
+ == NAC Average Darks ==
+This file contains the average dark image after masked pixels are subtracted.
+The image is subtracted from each line after the masked pixels.
+
+  Latest files created by Dave Humm on June 02, 2010. These files corresponded with the new
+  masked pixel subtraction algorithm: 
+    NACL_AverageDarks.0006.cub
+    NACL_AverageDarks_Summed.0006.cub
+    NACR_AverageDarks.0006.cub
+    NACR_AverageDarks_Summed.0006.cub
+
+ == NAC Flatfields ==
+This file contains the flatfield image. It is used as a divisor for each line.
+
+  Latest files created by Jacob Danton on June 20, 2010. They were generated using the most recent
+  yaw images (DOY 126) and a modified version of Eric Eliason's script. These values corresponded with
+  the new masked pixel subtraction algorithm:
+    NACL_Flatfield.0006.cub
+    NACL_Flatfield_Summed.0006.cub
+    NACR_Flatfield.0006.cub
+    NACR_Flatfield_Summed.0006.cub
+
+ == NAC Linearization ==
+These files contain the offsets and coefficients for the linearization of the
+NAC images. The *Coefficients file contains 3 values for each pixel in the
+line and the *Offsets contain a single offset value for each pixel. 
+
+  Latest files created by Dave Humm on June 02, 2010. These values corresponded with the new masked pixel
+  subtraction algorithm:
+    NACL_LinearizationCoefficients.0006.txt
+    NACL_LinearizationOffsets.0006.cub
+    NACL_LinearizationOffsets_Summed.0006.cub
+    NACR_LinearizationCoefficients.0006.txt
+    NACR_LinearizationOffsets.0006.cub
+    NACR_LinearizationOffsets_Summed.0006.cub
+
+ == NAC Radiometric ==
+This file contains the Radiometry coefficients for both I over F and Radiance
+absolute calibration.
+
+  Latest files created by Jacob Danton on Jan 21, 2010 with values confirmed by
+Dave Humm:
+    NAC_RadiometricResponsivity.0003.pvl
+   
+ 
+ == WAC Average Darks ==
+This file contains the average dark on a per WAC frame basis. It is subtracted
+from each frame in an image.
+
+  Latest files created by Eric Eliason on Feb 4, 2010:
+    wac_darks/WAC_[Instrument Mode]_Offset[CCD Offset]_[Temperature]C_[Time]T.0005.cub
+    
+ == WAC Flatfields ==
+This file contains the flatfield per WAC frame and is used as a divisor for
+each frame in an image.
+
+  Latest files created by Brett Denevi on Feb 5, 2010:
+    wac_flats/WAC_[Instrument Mode]_Flatfield.0003.cub
+
+ == WAC Radiometric ==
+This file contains the radiometric coefficients for both I over F and Radiance
+absolute calibration.
+
+  Latest files created by Jacob Danton on July 7, 2011 with values confirmed
+by Sarah Braden:
+    WAC_RadiometricResponsivity.0004.pvl
+
+ == WAC Special Pixels ==
+This file contains a frame mask for special pixels. It is applied to each
+frame in an image.
+
+  Latest files created by Brett Denevi on Feb 21, 2010:
+    WAC_UV_SpecialPixels.0002.cub
+  
+  Latest files created by Eric Eliason on ?:
+    ?
