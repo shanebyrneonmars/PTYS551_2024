@@ -18,7 +18,7 @@ Firstly, using the commands below, create an environment called ptys551 and inst
 
 ```bash
 conda env remove -n ptys551
-conda create -n ptys551 python=3.10 numpy=1.26.4 ipykernel scipy matplotlib scikit-learn spiceypy proj gmt gdal pandas rasterio tqdm spectral glob2 pyqt jupyterlab
+conda create -n ptys551 python=3.10 numpy=1.26.4 ipykernel scipy matplotlib scikit-learn spiceypy proj gmt gdal pandas rasterio tqdm spectral glob2 pyqt jupyterlab wget
 
 ### Add one more package with pip that is not available on conda-forge
 conda activate ptys551
