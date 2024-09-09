@@ -41,7 +41,7 @@ conda config --env --add channels conda-forge
 conda config --env --add channels usgs-astrogeology
 conda config --env --add channels nasa-ames-stereo-pipeline
 
-conda install -c nasa-ames-stereo-pipeline -c usgs-astrogeology -c conda-forge stereo-pipeline==3.3.0
+conda install -c nasa-ames-stereo-pipeline -c usgs-astrogeology -c conda-forge stereo-pipeline==3.3.0 wget
 python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=/Users/shane/ISISDATA
 conda activate asp
 ```
