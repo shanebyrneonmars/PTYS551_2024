@@ -1,0 +1,127 @@
+rm -rf *.lis *.prt *.cub Lev0 Lev1 Lev2 *.csv Chk_* *.txt *.net *.log Updated_Lev* *.dat
+
+
+; Prepare a PDS file list and directories
+;
+
+ls EDR/*.IMG | cut -d"/" -f2 | cut -d"." -f1 >! names.lis
+mkdir Lev0
+mkdir Lev1
+mkdir Lev2
+
+;
+; Create level 0 and 1 cubes and add various data to them
+;
+
+mdis2isis from=EDR/\$1.IMG to=Lev0/\$1.lev0.cub -batch=names.lis
+spiceinit from=Lev0/\$1.lev0.cub -batch=names.lis web=yes
+
+
+mdiscal from=Lev0/\$1.lev0.cub to=Lev1/\$1.lev1.cub -batch=names.lis
+camstats from=Lev1/\$1.lev1.cub attach=true linc=10 sinc=10 -batch=names.lis
+footprintinit from=Lev1/\$1.lev1.cub  linc=10 sinc=10 maxemission=89 maxincidence=89 increaseprecision=true -batch=names.lis
+ls Lev1/*.cub >! lev1.lis
+
+;***** USE QMOS TO VIEW THE FOOTPRINTS
+qmos lev1.lis
+
+;
+; Project to sinusoidal
+;
+
+cam2map from=Lev1/\$1.lev1.cub to=Lev2/\$1.lev2.cub map=sinu.map pixres=map -batchlist=names.lis
+ls Lev2/*.cub >! lev2.lis
+
+;
+; Mosaic with different blending strategies
+;
+
+automos fromlist=lev2.lis mosaic=slapdash.cub matchbandbin=false priority=average
+
+equalizer fromlist=lev2.lis process=both
+ls Lev2/*equ.cub >! lev2.equ.lis
+automos fromlist=lev2.equ.lis mosaic=equ_slapdash.cub matchbandbin=false priority=average
+
+
+
+;
+; Calculate overlaps and seed with control points
+;
+
+findimageoverlaps fromlist=lev1.lis overlaplist=overlaps.dat errors=ovl.err detailed=true
+overlapstats fromlist=lev1.lis overlaplist=overlaps.dat
+
+;***** Examine seed.def
+
+autoseed fromlist=lev1.lis overlaplist=overlaps.dat deffile=seed.def onet=auto.net errors=auto.err pointid="mess_??" networkid=MESS description="Ptys551"
+
+;***** USE QMOS TO VIEW THE FOOTPRINTS + CONTROL  NET
+qmos lev1.lis
+
+qnet
+
+
+;
+; Triage the control network by eliminating useless points
+;
+;***** Examine validmsr.def
+
+cnetref fromlist=lev1.lis cnet=auto.net onet=auto_ref.net log=auto_ref.log deffile=validmsr.def criteria=resolution type=mean
+
+; ***** USE QMOS and QNET to check decisions
+
+cnetedit cnet=auto_ref.net onet=auto_ref_edit.net
+
+;
+; Pattern matching with pointreg and culling the points that didn't work out
+;
+
+pointreg fromlist=lev1.lis cnet=auto_ref_edit.net onet=auto_ref_edit_reg.net deffile=pointreg_P31x31_S101x101.def flatfile=auto_ref_edit_reg.txt points=all measures=all
+
+pointreg fromlist=lev1.lis cnet=auto_ref_edit_reg.net onet=auto_ref_edit_reg2.net deffile=pointreg_P135x135_S200x200_gradient.def flatfile=auto_ref_edit_reg2.txt points=all measures=candidates
+
+cnetedit cnet=auto_ref_edit_reg2.net onet=auto_ref_edit_reg2_edit.net
+
+;
+; Quality checks on the control network
+;
+
+cnetcheck fromlist=lev1.lis cnet=auto_ref_edit_reg2_edit.net prefix=Chk_ tolerance=0.0
+cnetstats fromlist=lev1.lis cnet=auto_ref_edit_reg2_edit.net create_image_stats=yes image_stats_file=ImgStats_auto_ref_edit_reg2_edit.csv create_point_stats=yes point_stats_file=PtStats_auto_ref_edit_reg2_edit.csv
+
+;
+; Jigsaw!!! with update=no
+;
+
+jigsaw fromlist=lev1.lis cnet=auto_ref_edit_reg2_edit.net onet=JigOut.net update=no radius=no errorpropagation=no outlier_rejection=no sigma0=1.0e-10 maxits=10 camsolve=angles twist=yes spsolve=no camera_angles_sigma=0.025
+
+; ***** Inspect for problems here
+
+cp -R Lev1 Updated_Lev1
+ls Updated_Lev1/*cub >! lev1_updated.lis
+jigsaw fromlist=lev1_updated.lis cnet=auto_ref_edit_reg2_edit.net onet=JigOut.net update=yes radius=no errorpropagation=no outlier_rejection=no sigma0=1.0e-10 maxits=10 camsolve=angles twist=yes spsolve=no camera_angles_sigma=0.025
+
+
+;
+; New map projection
+;
+mkdir Updated_Lev2
+
+cam2map from=Updated_Lev1/\$1.lev1.cub to=Updated_Lev2/\$1.lev2.cub map=sinu.map pixres=map -batchlist=names.lis
+ls Updated_Lev2/*.cub >! lev2_updated.lis
+
+;
+; Mosaic with different blending strategies
+;
+
+automos fromlist=lev2_updated.lis mosaic=updated_slapdash.cub matchbandbin=false priority=average
+
+equalizer fromlist=lev2_updated.lis process=both
+ls Updated_Lev2/*equ.cub >! lev2_updated.equ.lis
+automos fromlist=lev2_updated.equ.lis mosaic=equ_updated_slapdash.cub matchbandbin=false priority=average
+
+blend fromlist=lev2_updated.lis stop=200
+ls Updated_Lev2/*blend.cub >! lev2_updated.blend.lis
+automos fromlist=lev2_updated.blend.lis mosaic=blend_updated_slapdash.cub matchbandbin=false priority=average
+
+
