@@ -398,6 +398,8 @@ class MainWindow(QMainWindow):
             self.statusBar.showMessage("Lasso Select Enabled")
             self.toolbar.setEnabled(False)
 
+            self.ax.mouse_init(rotate_btn=None, pan_btn=None, zoom_btn=None)
+
             if self.selector:
                 self.selector.disconnect()
             # logic to initialize the lasso selector
@@ -408,6 +410,8 @@ class MainWindow(QMainWindow):
         else:
             self.statusBar.showMessage("Lasso Select Disabled")
             self.toolbar.setEnabled(True)
+
+            self.ax.mouse_init(rotate_btn=1, pan_btn=3, zoom_btn=2)
 
             if self.selector:
                 self.selector.disconnect()
