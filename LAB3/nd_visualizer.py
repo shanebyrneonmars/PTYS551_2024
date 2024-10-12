@@ -273,6 +273,7 @@ class MainWindow(QMainWindow):
         self.endmember_manager = EndmemberManager()
         self.endmember_manager.init_table()
         self.fc = None
+        self.original_handlers = {}
         # self.endmember_manager.updated_selection.connect(self.slot_update_plot)
         self.initUI()
 
@@ -387,14 +388,17 @@ class MainWindow(QMainWindow):
     def lassoSelectOff(self):
         self.lassoEnabled = False
         self.handleLassoSelect()
-        
+    
+    def _on_event(self, event):
+        pass
+
     def handleLassoSelect(self):
-        # self.lassoEnabled = not self.lassoEnabled
+        
         if self.lassoEnabled:
             self.statusBar.showMessage("Lasso Select Enabled")
             self.toolbar.setEnabled(False)
-            
-            # Assuming there's a method to refresh or update the UI related to endmember groups
+
+            self.ax.mouse_init(rotate_btn=None, pan_btn=None, zoom_btn=None)
 
             if self.selector:
                 self.selector.disconnect()
@@ -406,6 +410,9 @@ class MainWindow(QMainWindow):
         else:
             self.statusBar.showMessage("Lasso Select Disabled")
             self.toolbar.setEnabled(True)
+
+            self.ax.mouse_init(rotate_btn=1, pan_btn=3, zoom_btn=2)
+
             if self.selector:
                 self.selector.disconnect()
                 self.selector = None

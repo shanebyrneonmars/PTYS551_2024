@@ -1,0 +1,51 @@
+rm -rf *.lis *.prt *.cub Lev0 Lev1 Lev2
+
+;
+; Prepare a PDS file list and directories
+;
+
+ls EDR/*.lbl | cut -d"/" -f2 | cut -d"." -f1 >! names.lis
+mkdir Lev0
+mkdir Lev1
+mkdir Lev2
+
+;
+; Create level 0 and 1 cubes and add various data to them
+;
+
+gllssi2isis from=EDR/\$1.lbl to=Lev0/\$1.lev0.cub -batch=names.lis framemode=auto
+spiceinit   from=Lev0/\$1.lev0.cub -batch=names.lis web=yes
+gllssical   from=Lev0/\$1.lev0.cub to=Lev1/\$1.lev1.cub -batch=names.lis
+
+camstats from=Lev1/\$1.lev1.cub attach=true linc=10 sinc=10 -batch=names.lis
+footprintinit from=Lev1/\$1.lev1.cub  linc=10 sinc=10 maxemission=89 maxincidence=89 increaseprecision=true -batch=names.lis
+ls Lev1/*.cub >! lev1.lis
+
+;***** USE QMOS TO VIEW THE FOOTPRINTS
+qmos lev1.lis
+
+;***** Examine sinu.map
+;***** Demo maptemplate
+
+;
+; project to sinusoidal
+;
+
+cam2map from=Lev1/\$1.lev1.cub to=Lev2/\$1.lev2.cub map=sinu.map pixres=map -batchlist=names.lis
+ls Lev2/*.cub >! lev2.lis
+
+;
+; Mosaic with different blending strategies
+;
+
+automos fromlist=lev2.lis mosaic=slapdash.cub matchbandbin=false priority=average
+
+#equalizer fromlist=lev2.lis process=both
+#ls Lev2/*equ.cub >! lev2.equ.lis
+#automos fromlist=lev2.equ.lis mosaic=equ_slapdash.cub matchbandbin=false priority=average
+
+blend fromlist=lev2.equ.lis stop=100
+ls Lev2/*blend.cub >! lev2.blend.lis
+automos fromlist=lev2.blend.lis mosaic=blend_slapdash.cub matchbandbin=false priority=average
+
+
