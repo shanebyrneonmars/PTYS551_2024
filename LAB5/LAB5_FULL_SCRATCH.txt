@@ -14,7 +14,7 @@ mkdir Lev2
 ;
 
 mdis2isis from=EDR/\$1.IMG to=Lev0/\$1.lev0.cub -batch=names.lis
-spiceinit from=Lev0/\$1.lev0.cub -batch=names.lis web=yes
+spiceinit from=Lev0/\$1.lev0.cub -batch=names.lis web=yes url=https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
 
 
 mdiscal from=Lev0/\$1.lev0.cub to=Lev1/\$1.lev1.cub -batch=names.lis
@@ -42,6 +42,8 @@ equalizer fromlist=lev2.lis process=both
 ls Lev2/*equ.cub >! lev2.equ.lis
 automos fromlist=lev2.equ.lis mosaic=equ_slapdash.cub matchbandbin=false priority=average
 
+;***** USE QVIEW TO VIEW THE RESULT - note the seams and offsets
+qview equ_slapdash.cub
 
 
 ;
@@ -57,9 +59,9 @@ autoseed fromlist=lev1.lis overlaplist=overlaps.dat deffile=seed.def onet=auto.n
 
 ;***** USE QMOS TO VIEW THE FOOTPRINTS + CONTROL  NET
 qmos lev1.lis
-
 qnet
 
+;***** File->Open Control Net and Cube List->lev1.lis and then auto.net
 
 ;
 ; Triage the control network by eliminating useless points
@@ -76,7 +78,7 @@ cnetedit cnet=auto_ref.net onet=auto_ref_edit.net
 ; Pattern matching with pointreg and culling the points that didn't work out
 ;
 
-pointreg fromlist=lev1.lis cnet=auto_ref_edit.net onet=auto_ref_edit_reg.net deffile=pointreg_P31x31_S101x101.def flatfile=auto_ref_edit_reg.txt points=all measures=all
+pointreg fromlist=lev1.lis cnet=auto_ref_edit.net     onet=auto_ref_edit_reg.net  deffile=pointreg_P31x31_S101x101.def            flatfile=auto_ref_edit_reg.txt  points=all measures=all
 
 pointreg fromlist=lev1.lis cnet=auto_ref_edit_reg.net onet=auto_ref_edit_reg2.net deffile=pointreg_P135x135_S200x200_gradient.def flatfile=auto_ref_edit_reg2.txt points=all measures=candidates
 

@@ -14,7 +14,7 @@ mkdir Lev2
 ;
 
 gllssi2isis from=EDR/\$1.lbl to=Lev0/\$1.lev0.cub -batch=names.lis framemode=auto
-spiceinit   from=Lev0/\$1.lev0.cub -batch=names.lis web=yes
+spiceinit   from=Lev0/\$1.lev0.cub -batch=names.lis web=yes url=https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
 gllssical   from=Lev0/\$1.lev0.cub to=Lev1/\$1.lev1.cub -batch=names.lis
 
 camstats from=Lev1/\$1.lev1.cub attach=true linc=10 sinc=10 -batch=names.lis

@@ -13,7 +13,7 @@ mkdir Lev2
 ;
 
 mdis2isis from=EDR/\$1.IMG to=Lev0/\$1.lev0.cub -batch=names.lis
-spiceinit from=Lev0/\$1.lev0.cub -batch=names.lis web=yes
+spiceinit from=Lev0/\$1.lev0.cub -batch=names.lis web=yes url=https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
 
 mdiscal from=Lev0/\$1.lev0.cub to=Lev1/\$1.lev1.cub -batch=names.lis
 
