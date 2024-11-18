@@ -1,0 +1,28 @@
+name: nn_env
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.12
+  - numpy
+  - matplotlib
+  - pandas
+  - scikit-learn
+  - tensorflow
+  - pytorch
+  - torchvision
+  - keras
+  - scikit-image
+  - opencv
+  - jupyter
+  - ipywidgets
+  - tqdm
+  - seaborn
+  - pillow
+  - pip
+  - pip:
+    - umap
+    - jupyterlab
+    - jupyter_contrib_nbextensions
+    - jupyter_nbextensions_configurator
