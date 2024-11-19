@@ -1,0 +1,111 @@
+# Start wsl
+
+conda activate asp
+mkdir ~/CTX
+cd ~/CTX
+cp ~/Desktop/asp_support_files/* .
+
+
+#
+# CTX example
+# New URLS for wget discovered September 2024
+
+wget https://planetarydata.jpl.nasa.gov/img/data/mro/mars_reconnaissance_orbiter/ctx/mrox_2469/data/F21_044073_1653_XN_14S037W.IMG
+wget https://planetarydata.jpl.nasa.gov/img/data/mro/mars_reconnaissance_orbiter/ctx/mrox_2475/data/F22_044218_1653_XN_14S037W.IMG 
+
+wget http://pds-imaging.jpl.nasa.gov/data/mro/mars_reconnaissance_orbiter/ctx/mrox_2469/data/F21_044073_1653_XN_14S037W.IMG
+wget http://pds-imaging.jpl.nasa.gov/data/mro/mars_reconnaissance_orbiter/ctx/mrox_2475/data/F22_044218_1653_XN_14S037W.IMG 
+
+mroctx2isis from=F21_044073_1653_XN_14S037W.IMG to=F21_044073_1653_XN_14S037W.lev0.cub
+mroctx2isis from=F22_044218_1653_XN_14S037W.IMG to=F22_044218_1653_XN_14S037W.lev0.cub
+
+spiceinit from=F21_044073_1653_XN_14S037W.lev0.cub web=true url=https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
+spiceinit from=F22_044218_1653_XN_14S037W.lev0.cub web=true url=https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
+
+ctxcal from=F21_044073_1653_XN_14S037W.lev0.cub to=F21_044073_1653_XN_14S037W.cal.cub
+ctxcal from=F22_044218_1653_XN_14S037W.lev0.cub to=F22_044218_1653_XN_14S037W.cal.cub
+
+ctxevenodd from=F21_044073_1653_XN_14S037W.cal.cub to=F21_044073_1653_XN_14S037W.lev1.cub
+ctxevenodd from=F22_044218_1653_XN_14S037W.cal.cub to=F22_044218_1653_XN_14S037W.lev1.cub
+
+
+#####  Start bundle adjustment section ####
+
+***** ADD FOOTRPINT INFO
+
+footprintinit from=F21_044073_1653_XN_14S037W.lev1.cub linc=100 sinc=100 increaseprecision=true
+footprintinit from=F22_044218_1653_XN_14S037W.lev1.cub linc=100 sinc=100 increaseprecision=true
+ls -1 *.lev1.cub > cube.lis
+
+***** Use "qmos cube.lis" to check out the overlap
+***** Create a grid of tie points that overlap the images
+
+seedgrid target=mars minlat=-15.4 maxlat=-13.8 minlon=322 maxlon=323 spacing=latlon latstep=0.025 lonstep=0.025 networkid="workshop" pointid="?????" description="ctx" onet=seed.net
+cnetadd addlist=cube.lis deffile=validmeasure.def retrieval=point onet=cnetadd.net polygon=true extract=modified cnet=seed.net
+cnetedit cnet=cnetadd.net onet=cnetadd-edt.net
+
+
+***** auto-find the matching features and do an experimental bundle adjustment to see where the problems are
+
+pointreg fromlist=cube.lis cnet=cnetadd-edt.net onet=control_pointreg.net deffile=pointreg_P31x31_S101x101.def
+cnetedit cnet=control_pointreg.net onet=control_pointreg_edit.net
+
+jigsaw fromlist=cube.lis update=no twist=no radius=yes cnet=control_pointreg_edit.net onet=control_ba.net model1=huber file_prefix="jig_" maxits=200 sigma0=1.0e-4 
+
+
+***** USE Qnet TO check points
+***** Open cube.lis and control_pointreg.net in qnet. Delete/modify suspect points.
+***** Open the file jig__bundleout_points.csv and sort by the Residual RMS (column E) High values likely for points 2205 and 1314.
+cp jig__bundleout_points.csv ~/Desktop
+***** Save control net after edits as control_pointreg_edit2.net and bundle adjust for real if you're happy
+    
+jigsaw fromlist=cube.lis update=yes twist=no radius=yes cnet=control_pointreg_edit2.net onet=control_ba.net model1=huber file_prefix="jig2_" maxits=200 sigma0=1.0e-4 
+
+
+#####  End bundle adjustment section ####
+
+
+
+
+cam2map4stereo.py -r 6 F21_044073_1653_XN_14S037W.lev1.cub F22_044218_1653_XN_14S037W.lev1.cub
+parallel_stereo -s stereo.map F21_044073_1653_XN_14S037W.map.cub F22_044218_1653_XN_14S037W.map.cub run_new/run_new
+
+point2dem --errorimage --orthoimage run_new/run_new-L.tif run_new/run_new-PC.tif
+hillshade --azimuth 300 --elevation 20 run_new/run_new-DEM.tif -o run_new/run_new-HILL.tif
+dem_geoid run_new/run_new-DEM.tif -o run_new/run_new-DEM
+
+***** Pause here to check out the "holey" DTM in QGIS
+
+point2dem --orthoimage-hole-fill-len 300 --dem-hole-fill-len 300 --errorimage --orthoimage run_new/run_new-L.tif run_new/run_new-PC.tif
+hillshade --azimuth 300 --elevation 20 run_new/run_new-DEM.tif -o run_new/run_new-HILL.tif
+dem_geoid run_new/run_new-DEM.tif -o run_new/run_new-DEM
+
+***** Pause here to check out registration to MOLA in QGIS
+
+pc_align --max-displacement 1000 --csv-format 1:lon,2:lat,5:radius_m run_new/run_new-DEM.tif PEDR_322E323E_16S13S_csv_table.csv --save-inv-transformed-reference-points -o stereo/run-align
+point2dem stereo/run-align-trans_reference.tif 
+hillshade --azimuth 300 --elevation 20 stereo/run-align-trans_reference-DEM.tif  -o stereo/run-align-trans_reference-HILL.tif 
+dem_geoid stereo/run-align-trans_reference-DEM.tif -o stereo/run-align-trans_reference-DEM
+
+***** Pause here to check out the new registration to MOLA in QGIS
+***** 
+head stereo/run-align-beg_errors.csv
+head stereo/run-align-end_errors.csv
+
+
+
+bundle_adjust F21_044073_1653_XN_14S037W.lev1.cub F22_044218_1653_XN_14S037W.lev1.cub --initial-transform stereo/run-align-inverse-transform.txt --apply-initial-transform-only -o ba_align/run
+mapproject stereo/run-align-trans_reference-DEM.tif F21_044073_1653_XN_14S037W.lev1.cub  left_map.tif --bundle-adjust-prefix ba_align/run
+mapproject stereo/run-align-trans_reference-DEM.tif F22_044218_1653_XN_14S037W.lev1.cub right_map.tif --bundle-adjust-prefix ba_align/run
+
+cp run_new/run_new-DEM.tif ~/Desktop/GIS
+cp run_new/run_new-DEM-adj.tif ~/Desktop/GIS
+cp run_new/run_new-HILL.tif ~/Desktop/GIS
+cp run_new/run_new-DRG.tif ~/Desktop/GIS
+cp run_new/run_new-IntersectionErr.tif ~/Desktop/GIS
+
+cp stereo/run-align-trans_reference-DEM-adj.tif ~/Desktop/GIS
+cp stereo/run-align-trans_reference-HILL.tif ~/Desktop/GIS
+cp left_map.tif ~/Desktop/GIS
+cp right_map.tif ~/Desktop/GIS
+

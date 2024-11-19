@@ -1,0 +1,22 @@
+ Object = AutoRegistration
+   Group = Algorithm
+     Name         = MaximumCorrelation
+     Tolerance    = 0.2
+     Gradient = Sobel
+   EndGroup
+ 
+   Group = PatternChip
+     Samples = 135 
+     Lines   = 135
+   EndGroup
+ 
+   Group = SearchChip
+     Samples = 200 
+     Lines   = 200 
+   EndGroup
+
+  Group = SurfaceModel
+    DistanceTolerance = 1.5
+    WindowSize        = 7
+  End_Group
+ EndObject
