@@ -1,0 +1,18 @@
+ Object = AutoRegistration
+  Group = Algorithm
+    Name         = MaximumCorrelation
+    Tolerance    = 0.7
+  EndGroup
+
+  Group = PatternChip
+    Samples = 21
+    Lines   = 21
+    MinimumZScore = 1.5
+    ValidPercent = 80
+  EndGroup
+
+  Group = SearchChip
+    Samples = 75
+    Lines   = 1000
+  EndGroup
+EndObject
